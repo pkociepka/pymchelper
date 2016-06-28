@@ -1,5 +1,5 @@
-from modules.runner.executor import Shield
-from modules.runner.set_tmax0 import set_tmax0
+from pymchelper.runner.executor import Shield
+from pymchelper.runner.set_tmax0 import set_tmax0
 from shutil import copytree, rmtree
 import os
 
@@ -16,7 +16,6 @@ class ShieldsManager:
     Class attributes:
         WORKSPACE_DIR - directory in which are created workspaces
         """
-
 
     _instance = None
     WORKSPACE_DIR = "workspaces/"
@@ -53,15 +52,14 @@ class ShieldsManager:
         :param int shield_id    id of shield in self.executors"""
         del self.executors[shield_id]
 
-
     def _prepare_workspace(self, input_files):
         """Preparing and copying files to workspace"""
         workspace_path = ShieldsManager.WORKSPACE_DIR + str(self.current_id)
         try:
             rmtree(workspace_path)
         except FileNotFoundError:
-            #it's ok that this directory does not exist
+            # it's ok that this directory does not exist
             pass
 
-        copytree(input_files, workspace_path) #copy input files to workspace path
+        copytree(input_files, workspace_path)  # copy input files to workspace path
         return workspace_path

@@ -4,8 +4,9 @@ Then:
 python3.4 -m modules.runner.executor_example input_files_path shield_hit_path
 """
 
-import modules.runner.executor as executor
+import pymchelper.runner.executor as executor
 import sys
+
 
 def run_example():
     default_input_files = "examples/simple"
@@ -16,10 +17,9 @@ def run_example():
         shield_hit = sys.argv[2]
     else:
         print("You can give in input_files and shield-hit paths like that: ")
-        print("python3.4 -m modules.runner.executor_example input_files_path shield_hit_path")
+        print("python -m pymchelper.runner.executor_example input_files_path shield_hit_path")
         input_files = default_input_files
         shield_hit = default_shield_hit
-
 
     s = executor.Shield(input_files, shield_hit)
     s.run()
@@ -30,7 +30,6 @@ def run_example():
         if s.communicate != last_communicate:
             last_communicate = s.communicate
             print(last_communicate)
-
 
     print("Output: " + s.output)
     print("Status:  " + s.status)
@@ -44,4 +43,3 @@ def run_example():
 
 if __name__ == '__main__':
     run_example()
-

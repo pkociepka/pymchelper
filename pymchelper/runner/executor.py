@@ -1,20 +1,20 @@
-'''
+"""
 Module allows to run shieldhit binary program, kill it, check current status, obtain current output (from stdout),
 communicate from data analyzer, stdout, stderr and special lines from stdout (containing ***)
-'''
+"""
 
 import os
 import threading
 import re
 from subprocess import Popen, PIPE
-from modules.runner.executor_exceptions import ExecutorError, NotEnoughMemoryError, ProcessAlreadyStarted
+from pymchelper.runner.executor_exceptions import ExecutorError, NotEnoughMemoryError, ProcessAlreadyStarted
 
 MEM_INFO_FILE = "/proc/meminfo"
 
 
 class Shield:
     """
-    Class which is main wrapper to manage shieldhit binary program.
+    Class which is main runner to manage shieldhit binary program.
     Attributes:
         communicate - communicate which informs about sheldhit's work
         last_stdout_line - last read line from stdout
@@ -33,7 +33,7 @@ class Shield:
     FINISHED_STATUS = 'finished'
     FAILED_STATUS = 'failed'
     TERMINATED_STATUS = 'terminated'
-    NEEDED_MEMORY_KB = 1705524 #it's VSZ, should it be used or rather RSS? /in kB
+    NEEDED_MEMORY_KB = 1705524  # it's VSZ, should it be used or rather RSS? /in kB
 
     def __init__(self, input_files='', shield_path=''):
         """
@@ -61,7 +61,7 @@ class Shield:
         if self.status == Shield.RUNNING_STATUS:
             raise ProcessAlreadyStarted
 
-        #if get_available_memory() < Shield.NEEDED_MEMORY_KB:
+        # if get_available_memory() < Shield.NEEDED_MEMORY_KB:
         #    raise NotEnoughMemoryError
 
         self._clear_attributes()
@@ -139,19 +139,18 @@ class Supervisor:
             self.shield.last_stdout_line = line
             self.shield.output += line
             self.analyze_line(line)
-            if self.p.poll() != None and line == '':
+            if self.p.poll() is not None and line == '':
                 break
 
-
-        _stdout, stderr = self.p.communicate() #stdout should be empty\
-        assert(_stdout == '')  #just in case I was wrong about having stdout clear after above while
-        self.shield.stderr = stderr #Only one thing which I've receiver here was 'Note:...'
-        #setting proper status in Shield class
+        _stdout, stderr = self.p.communicate()  # stdout should be empty\
+        assert (_stdout == '')  # just in case I was wrong about having stdout clear after above while
+        self.shield.stderr = stderr  # Only one thing which I've receiver here was 'Note:...'
+        # setting proper status in Shield class
         self.shield._read_end_status()
 
     def check_if_error_line(self, line):
         match = re.search('\*\*\* Error:', line)
-        if match != None:
+        if match is not None:
             self.shield.status = self.shield.FAILED_STATUS
             raise ExecutorError(line)
 
@@ -162,14 +161,15 @@ class Supervisor:
             self.check_if_error_line(line)
 
     def analyze_line(self, line):
-        if self.shield.communicate == None:
+        if self.shield.communicate is None:
             self.shield.communicate = "Initializing"
         self.check_if_special_line(line)
         match = re.search('^ * Calculating for', line)
         match2 = re.search('particle no.', line)
         match3 = re.search('^ * Transport completed', line)
-        if match != None or match2 != None or match3 != None:
+        if match is not None or match2 is not None or match3 is not None:
             self.shield.communicate = line
+
 
 def get_available_memory():
     """
@@ -178,4 +178,3 @@ def get_available_memory():
     memory_info = open(MEM_INFO_FILE).read()
     match = re.search('(MemFree: *)(\d+)', memory_info)
     return int(match.groups()[1])
-
