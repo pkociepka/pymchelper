@@ -1,0 +1,2 @@
+class ParseToTxtError(Exception):
+    pass
